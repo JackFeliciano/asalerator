@@ -1,5 +1,5 @@
 [Unit]
-Description=Asalerator pipeline register
+Description=Asalerator affiliate network
 After=network.target
 
 [Service]

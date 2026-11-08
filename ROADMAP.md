@@ -1,42 +1,33 @@
 # Asalerator roadmap
 
-Asalerator sells one item to a room of buyers. Version 1 holds the sale, the bids
-and the price rule in one process, and the list below is what a second sale and a
-second buyer need.
+Asalerator holds one network in one process. Version 1 keeps the businesses, the offers,
+the affiliates, the sales and the commission each affiliate earned, and the list below is
+what a second network and a real payout need.
 
 ## Open in the model
 
-- The winner pays one step over the bid that stood before. A seller cannot change
-  that rule, and a sale where the winner pays their own bid waits for a new draft
-  of SPEC.md.
-- A reserve price under the opening price is out of scope, so a sale that closes
-  under a reserve cannot say so.
-- Two bids on the last day at the same amount keep the earlier one. The rule that
-  settles it is not written down anywhere but the code.
+- The network pays the tier at the seller's depth and the tier above the seller for each
+  sponsored affiliate. Three tiers or more need a walk up the sponsor chain, and the model
+  stops at two.
+- A commission is computed when the page asks for it. Nothing writes a ledger, so a
+  payout cannot be reconciled against a date.
+- The affiliate discount and the commission tiers both come off the listed price. Whether
+  a business pays both out of the same price or one out of the other is undecided.
+- An offer that runs out of stock closes on a date only. Quantity waits for a decision.
 
-## Owed to a buyer
+## Owed to an affiliate
 
-- A buyer cannot withdraw a bid.
-- A buyer cannot see who else holds a bid. The page shows the standing amount and
-  the count.
-- Nothing tells a buyer that a bid landed. The caller has to read the answer.
+- An affiliate cannot see a sale they did not make.
+- An affiliate cannot leave a network, and a sponsor cannot be changed after they join.
+- A buyer at the end of the chain holds nothing but a code, so the affiliate has no way
+  to confirm a use.
 
-## Owed to a seller
+## Owed to a business
 
-- A sale cannot be withdrawn once it opens.
-- A sale cannot be extended. The closing day is fixed at the start.
-- There is no way to close a sale early.
+- A business cannot pause an offer or change its price once listed.
+- No report shows a business what the network sold and what it owes.
 
-## Owed to a reader
+## Next
 
-- The page shows every sale on the server and holds no filters.
-- The sale keeps only the standing bid and the bid before it, so a reader cannot
-  follow the whole run of bids.
-- No bid carries a seal, so a reader cannot tell a bid this sale took from one
-  written in afterwards.
-
-## Checks owed
-
-- Two bids on the closing day at the same amount.
-- A sale that closes on the day the first bid arrives.
-- A step of one cent and a step larger than the opening price.
+A ledger written on each sale, a quantity on the offer, and a walk up the sponsor chain
+that pays every tier the offer defines.

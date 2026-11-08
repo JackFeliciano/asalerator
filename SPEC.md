@@ -1,38 +1,71 @@
 # Asalerator
 
-Asalerator sells one item to a room of buyers who bid against each other. It keeps
-the sale, the bids and the rule that closes the sale, and it answers with the price
-the winner pays.
+Asalerator matches a business that has something to sell with an affiliate network
+that already exists. The business lists an offer, an affiliate takes it and moves it
+through their own contacts, and the network pays the commission the offer defines at
+each tier.
 
 ## Words
 
-- **sale**: one item offered between two days. It carries a handle, a title, an
-  opening price in cents, a step in cents and a closing day.
-- **bid**: one offer from one buyer. It carries a buyer handle, an amount in cents
-  and the day it arrived.
-- **step**: the smallest amount a bid may beat the standing bid by.
-- **standing bid**: the highest bid the sale holds.
-- **winner**: the buyer holding the standing bid when the sale closes. The winner
-  pays one step over the bid that stood before, never the winner's own ceiling.
+- **business**: one seller in industry, commerce or services. It carries a handle, a
+  name and a sector.
+- **offer**: one product or service a business lists. It carries a price in cents, a
+  discount in basis points for the affiliate who buys it for their own use, a list of
+  commission tiers in basis points and a closing day.
+- **affiliate**: one person in the network. It carries a handle, a name, a sponsor and
+  a depth. An affiliate at depth one names no sponsor.
+- **tier**: one level of the network, counted from the business. Tier one holds the
+  affiliate the business talks to.
+- **sale**: one offer moved by one affiliate on one day, at the price the affiliate
+  pays.
 
-## What the sale enforces
+## What the network enforces
 
-- A bid below the opening price lands nowhere.
-- A bid must beat the standing bid by at least the step. A bid level with the
-  standing bid lands nowhere.
-- A sale takes no bid after its closing day.
-- A buyer may bid more than once, and the later bid replaces the earlier one.
-- A sale with no bid closes unsold.
+- A handle is unique inside a network, for businesses, affiliates and offers alike.
+- A sponsor must already sit in the network when a new affiliate joins.
+- An offer names a business the network holds, and it carries at least one tier.
+- The discount sits below the whole price, and each tier sits between 1 and 10000
+  basis points.
+- A sale after the closing day lands nowhere.
+- A sale names an offer and an affiliate the network holds.
 
-## What the answer holds
+## What the affiliate earns
 
-The answer names the winner, the price in cents, the standing bid, the number of
-bids and the day the sale closed. A sale that never received a bid answers with no
-winner and a price of zero.
+An affiliate earns the tier at their own depth on each sale they make. An affiliate
+also earns the tier one level above the seller on each sale made by an affiliate they
+sponsored. A sale by an affiliate two levels down pays the affiliate nothing.
 
-## Open in version 1
+The answer comes back in whole cents, computed as the tier in basis points applied to
+the price the affiliate paid.
 
-- Whether a buyer may see the standing bid. The demo shows it.
-- What happens when two bids arrive on the last day at the same amount. The demo
-  keeps the earlier one.
-- Whether a reserve price sits under the opening price. The demo has none.
+## Routes
+
+- `/` the offers, the affiliates and the earnings of the sample network
+- `/health` JSON, the count of offers, affiliates and sales with the total paid out
+- `/assets/site.css` the stylesheet
+
+## Running it
+
+    ASALERATOR_BASE=/ php -S 127.0.0.1:8107 -t showroom showroom/index.php
+
+The suite runs with plain PHP and no dependencies:
+
+    php tests/run.php
+
+## The sample
+
+Three businesses list four offers across three tiers. Ana Reis sits at tier one.
+Bright Faria joined under Ana at tier two. Kestrel Dias joined under Bright at tier
+three. Marchmont Costa sits at tier one on their own. The sample holds three sales and
+pays 26640 cents in commission.
+
+## Layout
+
+    src/Home      Business, Offer, Affiliate, Sale, Network, Sample
+    src/App       Front, Router, Views
+    showroom      index.php and assets
+    tests         the runner and the suite
+
+## Licence
+
+Mozilla Public License 2.0. See LICENSE.

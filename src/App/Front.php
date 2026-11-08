@@ -21,15 +21,17 @@ final class Front
         $router = new Router($this->base);
         $views = new Views($this->base);
         $sample = new Sample();
+        $network = $sample->network();
 
         $router->get('/', static fn (): array => [200, [
-            'html' => $views->front($sample),
+            'html' => $views->front($network),
         ]]);
         $router->get('/health', static fn (): array => [200, ['json' => [
             'ok' => true,
-            'sales' => count($sample->sales()),
-            'bids' => $sample->bids(),
-            'sold' => count(array_filter($sample->sales(), static fn ($s): bool => $s->standing() !== null)),
+            'offers' => 4,
+            'affiliates' => 4,
+            'sales' => count($network->sales()),
+            'paid' => $network->earned('ana') + $network->earned('bright') + $network->earned('kestrel') + $network->earned('marchmont'),
         ]]]);
 
         [$status, $body] = $router->handle(

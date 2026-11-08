@@ -6,29 +6,41 @@ use Asalerator\Home\Sample;
 use Asalerator\Tests\Assert;
 
 return [
-    ['the sample holds three sales and five bids', static function (): void {
-        $sample = new Sample();
-        Assert::same(3, count($sample->sales()));
-        Assert::same(5, $sample->bids());
+    ['the sample holds four affiliates in one network', static function (): void {
+        $network = (new Sample())->network();
+        Assert::same(1, $network->affiliate('ana')->depth);
+        Assert::same(2, $network->affiliate('bright')->depth);
+        Assert::same(3, $network->affiliate('kestrel')->depth);
+        Assert::same(1, $network->affiliate('marchmont')->depth);
+        Assert::same(null, $network->affiliate('marchmont')->sponsor);
     }],
-    ['the press sale closes with a winner', static function (): void {
-        $answer = (new Sample())->sale('sale-press')->answer();
-        Assert::same('kestrel', $answer['buyer']);
-        Assert::same(31000, $answer['standing']);
-        Assert::same(27000, $answer['price']);
+    ['the sample holds four offers and three sales', static function (): void {
+        $network = (new Sample())->network();
+        Assert::same(3, $network->offer('freight-audit')->depth());
+        Assert::same(2, $network->offer('freight-pallet')->depth());
+        Assert::same(3, count($network->sales()));
     }],
-    ['the desk sale closes unsold', static function (): void {
-        $answer = (new Sample())->sale('sale-desk')->answer();
-        Assert::same(null, $answer['buyer']);
-        Assert::same(0, $answer['price']);
+    ['the freight audit pays a three tier chain', static function (): void {
+        $network = (new Sample())->network();
+        Assert::same(21600, $network->earned('ana'));
+        Assert::same(5040, $network->earned('bright'));
+        Assert::same(0, $network->earned('kestrel'));
+        Assert::same(0, $network->earned('marchmont'));
     }],
-    ['the lamp sale holds two bids from two buyers', static function (): void {
-        $sale = (new Sample())->sale('sale-lamps');
-        Assert::same(2, $sale->bids());
-        Assert::same('marchmont', $sale->standing()->buyer);
-        Assert::same(9250, $sale->answer()['price']);
+    ['the dinner sale pays the seller and the sponsor', static function (): void {
+        $network = (new Sample())->network();
+        Assert::same(0, $network->earned('kestrel'));
+        Assert::same(5040, $network->earned('bright'));
     }],
-    ['an unknown sale answers nothing', static function (): void {
-        Assert::throws(static fn () => (new Sample())->sale('sale-nothing'), 'no sale called');
+    ['the sample pays out what the three sales carry', static function (): void {
+        $network = (new Sample())->network();
+        $total = 0;
+        foreach (['ana', 'bright', 'kestrel', 'marchmont'] as $handle) {
+            $total += $network->earned($handle);
+        }
+        Assert::same(26640, $total);
+    }],
+    ['an unknown offer answers nothing', static function (): void {
+        Assert::throws(static fn () => (new Sample())->network()->offer('offer-nothing'), 'no offer called');
     }],
 ];

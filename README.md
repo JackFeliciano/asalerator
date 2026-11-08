@@ -1,82 +1,50 @@
 # Asalerator
 
-## What the project is
+Asalerator matches a business that has something to sell with an affiliate network that
+already exists. The business lists an offer, an affiliate takes it and moves it through
+their own contacts, and the network pays the commission the offer defines at each tier.
 
-Asalerator is a PHP 8.3 program for running sales where buyers compete by bidding against each other. Each sale has a handle, title, opening price in cents, bidding step in cents and closing day.
+## What it holds
 
-A buyer submits a bid with their handle, amount in cents and arrival day. A bid below the opening price is rejected. Each new bid must beat the standing bid by at least the required step. A bid that matches the standing bid does not qualify.
+A business carries a handle, a name and a sector of industry, commerce or services. An
+offer carries a price, an affiliate discount, commission tiers and a closing day. An
+affiliate carries a handle, a sponsor and a depth in the network. A sale carries the
+offer, the affiliate, the amount paid and the day.
 
-Buyers can bid more than once. A later valid bid replaces their earlier bid. The sale refuses bids after its closing day.
+## What the network enforces
 
-When a sale closes, the winner pays one step above the bid that stood before their winning bid. The winner never pays their own bid ceiling. A sale with no valid bids closes unsold.
+A handle is unique inside the network. A sponsor must already sit in the network when an
+affiliate joins. An offer names a business the network holds. A sale after the closing day
+lands nowhere.
 
-The result names the winner, price, standing bid, number of bids and closing day.
+## What an affiliate earns
 
-The demo contains 3 sales and 5 bids. Two sales closed with a winner.
+The tier at their own depth on each sale they make. The tier one level above the seller
+on each sale made by an affiliate they sponsored. A sale two levels down pays nothing.
 
-The program uses plain PHP 8.3. It requires no Composer and no packages.
+## Routes
 
-## How to run it
+    /              the offers, the affiliates and the earnings
+    /health        counts and the total paid out
+    /assets/site.css
 
-Run the test suite from the repository root:
+## Running it
 
-```bash
-php tests/run.php
-```
+    ASALERATOR_BASE=/ php -S 127.0.0.1:8107 -t showroom showroom/index.php
+    php tests/run.php
 
-Start the demo with PHP's built-in server:
+## The sample
 
-```bash
-php -S 127.0.0.1:8107 -t showroom showroom/index.php
-```
+Three businesses, four offers, four affiliates across three tiers, three sales and 26640
+cents of commission.
 
-The application uses `/` as its default URL prefix. If a proxy passes a different prefix, set `ASALERATOR_BASE` to that value.
+## Layout
 
-## What the routes answer
-
-The demo exposes 2 routes.
-
-`/` renders the sample sales and their results.
-
-`/health` answers with the sales count, bid count and number of sales that closed with a winner.
-
-The home route displays the 3 sample sales and their bidding outcomes. Visitors can see which sales found a winner and which closed unsold.
-
-The health route provides counts from the demonstration data.
-
-## How the layout is arranged
-
-The repository separates sale and bid logic from request handling, presentation, tests and deployment files.
-
-`src/Home/` holds `Bid`, `Sale` and `Sample`.
-
-`src/App/` holds the router, front controller and HTML.
-
-`showroom/` holds the entry file and stylesheet.
-
-`tests/` holds the test suite.
-
-`deploy/` holds the systemd unit and nginx location block.
-
-`SPEC.md` describes the sale rules.
-
-The specification states the project vocabulary, what a sale refuses and what version 1 leaves open.
-
-The src/Home/ directory contains the main sale and bid logic. The src/App/ directory handles requests and page output. The remaining directories support the demo, testing and deployment.
-
-## The state of the suite
-
-The repository includes a hand-written test runner with 16 checks.
-
-Run all checks with:
-
-```bash
-php tests/run.php
-```
-
-The runner needs no package installation and no test framework. It checks the program from the command line.
+    src/Home      Business, Offer, Affiliate, Sale, Network, Sample
+    src/App       Front, Router, Views
+    showroom      index.php and assets
+    tests         the runner and the suite
 
 ## Licence
 
-The repository uses the Mozilla Public License 2.0 (MPL 2.0). You may use, modify and distribute the code. You must publish changes to files covered by the licence.
-
+Mozilla Public License 2.0. See LICENSE.

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Asalerator\App;
 
+use Asalerator\Home\Affiliate;
+use Asalerator\Home\Network;
+use Asalerator\Home\Offer;
 use Asalerator\Home\Sale;
-use Asalerator\Home\Sample;
 
 /**
  * The HTML. Every string reaching the page goes through h(), and every amount in
@@ -25,6 +27,11 @@ final class Views
     private function money(int $cents): string
     {
         return number_format($cents / 100, 2, '.', ',') . ' EUR';
+    }
+
+    private function share(int $basisPoints): string
+    {
+        return number_format($basisPoints / 100, 0, '.', ',') . ' percent';
     }
 
     public function header(string $title): string
@@ -52,33 +59,38 @@ HTML;
         return "</main>\n</body>\n</html>\n";
     }
 
-    public function front(Sample $sample): string
+    public function front(Network $network): string
     {
-        $TITLE = 'Asalerator, one item sold at a time';
-        $LEDE = 'Asalerator runs sales where buyers compete by bidding against each other.';
-        $WHAT = 'Each sale has a title, opening price, bidding step and closing day. A buyer submits a bid with their handle, amount and arrival day. The bid must meet the opening price and beat the standing bid by at least the required step. Buyers can bid more than once, with each later bid replacing their earlier one. After the closing day, the sale takes no more bids. The winner pays one step above the previous standing bid, not their own bid amount.';
+        $TITLE = 'Asalerator, a marketplace of sales opportunities';
+        $LEDE = 'Asalerator connects businesses with affiliate networks that sell their products and services through personal contacts and tiered commissions.';
+        $WHAT = 'Asalerator is a sales platform where businesses list products and services for affiliate networks to promote. Affiliates can buy an offer at a discount for their own use or refer it to others and earn commissions. The system tracks network relationships, sales and earnings across the commission tiers defined for each opportunity.';
 
         $out = $this->header($TITLE);
         $out .= '<h1>' . $this->h($TITLE) . '</h1>' . "\n";
         $out .= '<p class="lede">' . $this->h($LEDE) . '</p>' . "\n";
         $out .= '<p>' . $this->h($WHAT) . '</p>' . "\n";
-        $out .= '<p class="stage">Sales: ' . count($sample->sales()) . '. Bids taken: ' . $sample->bids()
-            . '. Closed with a winner: ' . count(array_filter($sample->sales(), static fn (Sale $s): bool => $s->standing() !== null)) . '.</p>' . "\n";
+        $out .= '<p class="stage">Offers: ' . count($this->offers($network)) . '. Affiliates: ' . count($this->affiliates($network))
+            . '. Sales: ' . count($network->sales()) . '. Paid out: ' . $this->sumPaid($network) . '.</p>' . "\n";
 
-        $out .= '<div class="sales">' . "\n";
-        foreach ($sample->sales() as $sale) {
-            $out .= $this->card($sale);
+        $out .= '<div class="offers">' . "\n";
+        foreach ($this->offers($network) as $offer) {
+            $out .= $this->card($network, $offer);
         }
         $out .= '</div>' . "\n";
 
-        $out .= '<h2>What a sale does</h2>' . "\n";
+        $out .= '<h2>Who earns what</h2>' . "\n";
+        $out .= '<ul class="earners">' . "\n";
+        foreach ($this->affiliates($network) as $affiliate) {
+            $out .= '<li>' . $this->earner($network, $affiliate) . '</li>' . "\n";
+        }
+        $out .= '</ul>' . "\n";
+
+        $out .= '<h2>What an affiliate does</h2>' . "\n";
         $out .= '<ol class="steps">' . "\n";
         foreach ([
-            ['Sale opens', 'The sale publishes its title, opening price, step and closing day.'],
-            ['Bid arrives', 'A buyer submits a bid with their handle and amount.'],
-            ['Standing bid moves', 'A valid higher bid replaces the previous bid from that buyer.'],
-            ['Sale closes', 'The sale stops accepting bids after its closing day.'],
-            ['Winner is named', 'The result gives the winner, price and final bidding details.'],
+            ['Join', 'Join an existing affiliate network and explore the opportunities businesses offer.'],
+            ['Choose', 'Choose an opportunity and either buy it at a discount or refer it to people you know.'],
+            ['Earn', 'Earn commissions from your own sales and from sales made by affiliates you bring into the network, according to the defined tiers.'],
         ] as [$step, $line]) {
             $out .= '<li><strong>' . $this->h($step) . '</strong> ' . $this->h($line) . '</li>' . "\n";
         }
@@ -88,19 +100,66 @@ HTML;
         return $out;
     }
 
-    private function card(Sale $sale): string
+    /** @return list<Offer> */
+    private function offers(Network $network): array
     {
-        $answer = $sale->answer();
-        $out = '<article class="sale">' . "\n";
-        $out .= '<h2>' . $this->h($sale->title) . '</h2>' . "\n";
-        $out .= '<p class="where">Opens at ' . $this->h($this->money($sale->opening)) . ', step ' . $this->h($this->money($sale->step))
-            . ', closes ' . $this->h($sale->closingDay) . '. Bids: ' . $sale->bids() . '.</p>' . "\n";
-        if ($answer['buyer'] === null) {
-            $out .= '<p class="unsold">Closed unsold. No buyer holds a bid.</p>' . "\n";
-        } else {
-            $out .= '<p class="sold">' . $this->h((string) $answer['buyer']) . ' wins at ' . $this->h($this->money((int) $answer['price']))
-                . '. The standing bid was ' . $this->h($this->money((int) $answer['standing'])) . '.</p>' . "\n";
+        $list = [];
+        foreach (['freight-audit', 'freight-pallet', 'alv-survey', 'tab-dinner'] as $handle) {
+            $list[] = $network->offer($handle);
         }
+
+        return $list;
+    }
+
+    /** @return list<Affiliate> */
+    private function affiliates(Network $network): array
+    {
+        $list = [];
+        foreach (['ana', 'bright', 'kestrel', 'marchmont'] as $handle) {
+            $list[] = $network->affiliate($handle);
+        }
+
+        return $list;
+    }
+
+    private function sumPaid(Network $network): string
+    {
+        $total = 0;
+        foreach ($this->affiliates($network) as $affiliate) {
+            $total += $network->earned($affiliate->handle);
+        }
+
+        return $this->money($total);
+    }
+
+    private function earner(Network $network, Affiliate $affiliate): string
+    {
+        $line = $this->h($affiliate->name) . ' sits at tier ' . $affiliate->depth . '. ';
+        $line .= 'Earned ' . $this->h($this->money($network->earned($affiliate->handle))) . ' on this network.';
+
+        return $line;
+    }
+
+    private function card(Network $network, Offer $offer): string
+    {
+        $out = '<article class="offer">' . "\n";
+        $out .= '<h2>' . $this->h($offer->title) . '</h2>' . "\n";
+        $out .= '<p class="where">Listed at ' . $this->h($this->money($offer->price)) . '. An affiliate pays '
+            . $this->h($this->money($offer->affiliatePrice())) . '. Closes ' . $this->h($offer->closesOn) . '.</p>' . "\n";
+
+        $tiers = [];
+        foreach ($offer->tiers as $index => $share) {
+            $tiers[] = 'tier ' . ($index + 1) . ' ' . $this->share($share);
+        }
+        $out .= '<p class="terms">Commission: ' . $this->h(implode(', ', $tiers)) . '.</p>' . "\n";
+
+        $moved = 0;
+        foreach ($network->sales() as $sale) {
+            if ($sale->offer === $offer->handle) {
+                $moved++;
+            }
+        }
+        $out .= '<p class="moved">Sales held: ' . $moved . '.</p>' . "\n";
         $out .= '</article>' . "\n";
 
         return $out;
