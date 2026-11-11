@@ -1,8 +1,11 @@
 # Asalerator
 
-Asalerator matches a business that has something to sell with an affiliate network that
-already exists. The business lists an offer, an affiliate takes it and moves it through
-their own contacts, and the network pays the commission the offer defines at each tier.
+Asalerator is an affiliate sales platform that connects businesses with existing networks
+of independent sellers.
+
+A business lists products and services as sales opportunities. An affiliate can buy an
+opportunity at a discount or refer a buyer for a commission. Each opportunity defines its
+own commission tiers.
 
 ## What it holds
 

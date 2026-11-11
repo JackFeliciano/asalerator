@@ -1,8 +1,8 @@
 # Asalerator roadmap
 
-Asalerator holds one network in one process. Version 1 keeps the businesses, the offers,
-the affiliates, the sales and the commission each affiliate earned, and the list below is
-what a second network and a real payout need.
+Asalerator holds one affiliate network in one process. Version 1 keeps the businesses, the
+sales opportunities, the independent sellers, the sales and the commission each seller
+earned, and the list below is what a second network and a real payout need.
 
 ## Open in the model
 

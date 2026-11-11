@@ -62,8 +62,8 @@ HTML;
     public function front(Network $network): string
     {
         $TITLE = 'Asalerator, a marketplace of sales opportunities';
-        $LEDE = 'Asalerator connects businesses with affiliate networks that sell their products and services through personal contacts and tiered commissions.';
-        $WHAT = 'Asalerator is a sales platform where businesses list products and services for affiliate networks to promote. Affiliates can buy an offer at a discount for their own use or refer it to others and earn commissions. The system tracks network relationships, sales and earnings across the commission tiers defined for each opportunity.';
+        $LEDE = 'Asalerator is an affiliate sales platform that connects businesses with existing networks of independent sellers.';
+        $WHAT = 'A business lists products and services as sales opportunities. An affiliate can buy an opportunity at a discount or refer a buyer for a commission. Each opportunity defines its own commission tiers.';
 
         $out = $this->header($TITLE);
         $out .= '<h1>' . $this->h($TITLE) . '</h1>' . "\n";
@@ -88,9 +88,9 @@ HTML;
         $out .= '<h2>What an affiliate does</h2>' . "\n";
         $out .= '<ol class="steps">' . "\n";
         foreach ([
-            ['Join', 'Join an existing affiliate network and explore the opportunities businesses offer.'],
-            ['Choose', 'Choose an opportunity and either buy it at a discount or refer it to people you know.'],
-            ['Earn', 'Earn commissions from your own sales and from sales made by affiliates you bring into the network, according to the defined tiers.'],
+            ['List the opportunity', 'A business lists a product or service as a sales opportunity with its own commission tiers.'],
+            ['Take the opportunity', 'An affiliate joins the network of independent sellers and takes the opportunity, by buying it at a discount or by referring a buyer.'],
+            ['Earn the commission', 'The system records the sale and calculates the commission the affiliate earns.'],
         ] as [$step, $line]) {
             $out .= '<li><strong>' . $this->h($step) . '</strong> ' . $this->h($line) . '</li>' . "\n";
         }
